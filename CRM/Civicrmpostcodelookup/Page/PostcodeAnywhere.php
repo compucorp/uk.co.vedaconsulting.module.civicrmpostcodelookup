@@ -124,6 +124,7 @@ class CRM_Civicrmpostcodelookup_Page_PostcodeAnywhere extends CRM_Civicrmpostcod
 		$addressItem = (array) $addressItemRow['Row'];
 
 		$addressLineArray[] = $addressItem['@attributes']['Company'];
+		$addressLineArray[] = $addressItem['@attributes']['SubBuilding'];
 		$addressLineArray[] = $addressItem['@attributes']['BuildingName'];
 		$addressLineArray[] = $addressItem['@attributes']['BuildingNumber'];
 		$addressLineArray[] = $addressItem['@attributes']['PrimaryStreet'];
