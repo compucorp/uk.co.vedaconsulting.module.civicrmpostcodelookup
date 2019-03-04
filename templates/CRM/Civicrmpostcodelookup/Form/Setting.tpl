@@ -103,11 +103,12 @@ function showFields() {
 }
 
 function importMethodToggle() {
-  if (cj('input[name="import_method"]:checked').val() === '1') {
+  var importMethod = cj('input[name="import_method"]:checked').val();
+  if (importMethod === '1') {
     cj('#paf_file').parent().parent().show();
     cj('#paf_file_url').parent().parent().hide();
   }
-  else {
+  else if(importMethod === '2') {
     cj('#paf_file_url').parent().parent().show();
     cj('#paf_file').parent().parent().hide()
   }
