@@ -34,7 +34,7 @@
 <script>
 cj( document ).ready(function() {
   cj('#server').parent().append('<br />Without trailing slash. Example: http://pce.afd.co.uk , http://civipostcode.com');
-  cj('#CIVICRM_QFID_1_import_method').parent().append('<br /> <br /> Please provide PAF file in CSV format gotten from Royal Mail');
+  cj('#CIVICRM_QFID_1_import_method').parent().append('<br /> <br /> Please provide PAF file in CSV format received from the Royal Mail');
   hideAllFields();
   showFields();
   cj('#provider').change(function() {
