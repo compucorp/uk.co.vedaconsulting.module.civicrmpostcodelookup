@@ -34,11 +34,15 @@
 <script>
 cj( document ).ready(function() {
   cj('#server').parent().append('<br />Without trailing slash. Example: http://pce.afd.co.uk , http://civipostcode.com');
+  cj('#CIVICRM_QFID_1_import_method').parent().append('<br /> <br /> Please provide PAF file in CSV format gotten from Royal Mail');
   hideAllFields();
   showFields();
   cj('#provider').change(function() {
     hideAllFields();
     showFields();
+  });
+  cj('input[name="import_method"]').click(function() {
+    importMethodToggle();
   });
 });
 
@@ -48,6 +52,9 @@ function hideAllFields() {
   cj('#serial_number').parent().parent().hide();
   cj('#username').parent().parent().hide();
   cj('#password').parent().parent().hide();
+  cj('#CIVICRM_QFID_1_import_method').parent().parent().hide();
+  cj('#paf_file_url').parent().parent().hide();
+  cj('#paf_file').parent().parent().hide();
 }
 
 function showFields() {
@@ -84,7 +91,28 @@ function showFields() {
     cj('#api_key').parent().parent().show();
     cj('#server').val('https://api.getAddress.io');
   }
+
+  if (providerVal == 'serverupload') {
+    cj('#CIVICRM_QFID_1_import_method').parent().parent().show();
+    var pafFileName = {/literal}"{$pafFileName}"{literal};
+    if (pafFileName) {
+      cj('#paf_file').after('<div>' + pafFileName + ' was the last processed uploaded file! </div>');
+    }
+    importMethodToggle();
+  }
 }
+
+function importMethodToggle() {
+  if (cj('input[name="import_method"]:checked').val() === '1') {
+    cj('#paf_file').parent().parent().show();
+    cj('#paf_file_url').parent().parent().hide();
+  }
+  else {
+    cj('#paf_file_url').parent().parent().show();
+    cj('#paf_file').parent().parent().hide()
+  }
+}
+
 </script>
 {/literal}
 

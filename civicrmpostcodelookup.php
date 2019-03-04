@@ -9,7 +9,8 @@ $GLOBALS["providers"] = array(
       'civipostcode' => 'CiviPostcode',
       'experian' => 'Experian',
       'postcodeanywhere' => 'PostcodeAnywhere',
-      'getaddressio'  => 'GetAddress'
+      'getaddressio'  => 'GetAddress',
+      'serverupload' => 'Upload To Server'
       );
 
 /**

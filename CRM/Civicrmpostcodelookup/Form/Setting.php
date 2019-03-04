@@ -68,6 +68,36 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
       false
     );
 
+    $this->addRadio(
+      'import_method',
+      ts('Import Method'),
+      array('1' => ts('Upload File'), '2' => ts('Import from URL'))
+    );
+
+    // PAF file upload
+    $this->addElement(
+      'file',
+      'paf_file',
+      ts('Upload PAF File'),
+      array('size' => 30, 'maxlength' => 255, 'accept' => '.csv,text/plain'),
+      false
+    );
+
+    $this->addElement(
+      'hidden',
+      'paf_file_name',
+      "Field to store file name for uploaded PAF file"
+    );
+
+    // PAF file URL link
+    $this->addElement(
+      'text',
+      'paf_file_url',
+      ts('Import PAF from URL'),
+      array('size' => 50),
+      false
+    );
+
     //MV#4367 Location Types
     $locationTypes = array_flip(CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
 
@@ -92,6 +122,8 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
 
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
+    // assign PAF file name value.
+    $this->assign('pafFileName', !empty($settingsArray['paf_file_name']) ? $settingsArray['paf_file_name'] : '');
     parent::buildQuickForm();
   }
 
@@ -159,6 +191,31 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
   function postProcess() {
     $values = $this->exportValues();
 
+    // Validates uploaded PAF file
+    $isPafFileUpload = $values['provider'] =='serverupload' && $values['import_method'] == 1;
+    if ($isPafFileUpload && !empty($this->_submitFiles['paf_file']['tmp_name'])) {
+      try{
+        $this->validateUploadedPaf($this->_submitFiles['paf_file']);
+      } catch(Exception $e) {
+        CRM_Core_Session::setStatus($e->getMessage(), 'Error', 'error');
+
+        return;
+      }
+    }
+
+    // Validates PAF file from remote URL
+    $isPafFileUrl = $values['provider'] =='serverupload' && $values['import_method'] == 2;
+    if ($isPafFileUrl && !empty($values['paf_file_url'])) {
+      try {
+        $pafFileUrl = $this->downloadPafFile($values['paf_file_url']);
+        $this->validateDownloadedPaf($pafFileUrl);
+      } catch(Exception $e) {
+        CRM_Core_Session::setStatus($e->getMessage(), 'Error', 'error');
+
+        return;
+      }
+    }
+
     $settingsArray = array();
     $settingsArray['provider'] = $values['provider'];
 
@@ -199,15 +256,34 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
       $settingsArray['location_type_id'] = $values['location_type_id'];
     }
 
+    if ($values['provider'] == 'serverupload') {
+      $settingsArray['import_method'] = $values['import_method'];
+      $settingsArray['paf_file_url'] = $values['paf_file_url'];
+      if ($isPafFileUpload && !empty ($this->_submitFiles['paf_file']['name'])) {
+        $settingsArray['paf_file_name'] = $this->_submitFiles['paf_file']['name'];
+      }
+    }
+
     $settingsStr = serialize($settingsArray);
 
+    // Process uploaded PAF file
+    if ($isPafFileUpload && !empty($this->_submitFiles['paf_file']['tmp_name'])) {
+      $this->processPAfFile($this->_submitFiles['paf_file']['tmp_name']);
+    }
+
+    // Process PAF file downloaded from remote Url
+    if ($isPafFileUrl && !empty($values['paf_file_url'])) {
+      $this->processPAfFile($pafFileUrl);
+    }
+
     CRM_Core_BAO_Setting::setItem($settingsStr,
-          'CiviCRM Postcode Lookup',
-          'api_details'
-        );
+      'CiviCRM Postcode Lookup',
+      'api_details'
+    );
 
     $message = "Settings saved.";
     CRM_Core_Session::setStatus($message, 'Postcode Lookup', 'success');
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/postcodelookup/settings'));
   }
 
   function getProviderOptions() {
@@ -237,5 +313,77 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
       }
     }
     return $elementNames;
+  }
+
+  /**
+   * Checks if the file uploaded is a valid file in proper format and
+   * if the size does not exceed the max upload limit.
+   *
+   * @param array $fileData
+   */
+  private function validateUploadedPaf($fileData) {
+    if (!in_array($fileData['type'], ['text/csv', 'text/plain'])) {
+      throw new Exception('Only PAF files in CSV format are allowed!');
+    }
+    $maxFileSize = $this->_maxFileSize;
+
+    if ($fileData['size'] > $maxFileSize) {
+      throw new Exception('PAF File size is greater than maximum upload limit!');
+    }
+  }
+
+  /**
+   * Checks if the file downloaded from the remote URL is in
+   * the expected file format.
+   *
+   * @param string $fileLocation
+   */
+  private function validateDownloadedPaf($fileLocation) {
+    $mimeType = mime_content_type($fileLocation);
+    if (!in_array($mimeType, ['text/csv', 'text/plain'])) {
+      throw new Exception('Only PAF files in CSV format are allowed!');
+    }
+  }
+
+  /**
+   * Imports the PAF file into the paf postcode look up table.
+   *
+   * @param string $filePath
+   */
+  private function processPAfFile($filePath) {
+    CRM_Core_DAO::executeQuery("DELETE FROM paf_post_code_lookup");
+    CRM_Core_DAO::executeQuery(
+        "LOAD DATA LOCAL INFILE '{$filePath}' 
+      INTO TABLE paf_post_code_lookup
+      FIELDS TERMINATED BY ',' 
+      LINES TERMINATED BY '\r\n'
+      (post_code, post_town, dependent_locality, 
+       double_dependent_locality, thoroughfare_descriptor,
+       dependent_thoroughfare_descriptor, building_number,building_name,
+       sub_building_name, po_box, department_name, organisation_name,
+       udprn, postcode_type, su_organisation_indicator, delivery_point_suffix)"
+    );
+  }
+
+  /**
+   * Downloads the PAF csv file to the server and returns the
+   * file location on the server.
+   *
+   * @param string $remotefileUrl
+   *
+   * @return string
+   */
+  private function downloadPafFile($remotefileUrl) {
+    set_time_limit(0);
+    $path = tempnam(sys_get_temp_dir(), 'prefix');
+    $fp = fopen ($path, 'w+');
+    $ch = curl_init(str_replace(" ","%20", $remotefileUrl));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+    curl_setopt($ch, CURLOPT_FILE, $fp);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_exec($ch);
+    curl_close($ch);
+
+    return $path;
   }
 }
