@@ -200,3 +200,14 @@ function civicrmpostcodelookup_civicrm_permission(&$permissions) {
     'access postcode lookup' => $prefix . ts('Access CiviCRM Postcode lookups'),
   );
 }
+
+function civicrmpostcodelookup_civicrm_entityTypes(&$entityTypes) {
+  $entityTypes = array_merge($entityTypes, array (
+    'CRM_Civicrmpostcodelookup_DAO_PafPostcodeLookup' =>
+      array (
+        'name' => 'PafPostcodeLookup',
+        'class' => 'CRM_Civicrmpostcodelookup_DAO_PafPostcodeLookup',
+        'table' => 'civicrm_paf_postcode_lookup',
+      ),
+  ));
+}
