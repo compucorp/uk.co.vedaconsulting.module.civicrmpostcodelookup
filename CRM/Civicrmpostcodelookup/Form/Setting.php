@@ -352,8 +352,8 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
    */
   private function processPAfFile($filePath) {
     CRM_Core_DAO::executeQuery("DELETE FROM paf_post_code_lookup");
-    CRM_Core_DAO::executeQuery(
-        "LOAD DATA LOCAL INFILE '{$filePath}' 
+    CRM_Core_DAO::executeQuery("
+      LOAD DATA LOCAL INFILE '{$filePath}' 
       INTO TABLE paf_post_code_lookup
       FIELDS TERMINATED BY ',' 
       LINES TERMINATED BY '\r\n'
