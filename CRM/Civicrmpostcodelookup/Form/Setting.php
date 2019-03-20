@@ -124,6 +124,7 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
     $this->assign('elementNames', $this->getRenderableElementNames());
     // assign PAF file name value.
     $this->assign('pafFileName', !empty($settingsArray['paf_file_name']) ? $settingsArray['paf_file_name'] : '');
+    $this->assign('maxFileSize', $this->_maxFileSize);
     parent::buildQuickForm();
   }
 
@@ -269,11 +270,13 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
     // Process uploaded PAF file
     if ($isPafFileUpload && !empty($this->_submitFiles['paf_file']['tmp_name'])) {
       $this->processPAfFile($this->_submitFiles['paf_file']['tmp_name']);
+      unlink($this->_submitFiles['paf_file']['tmp_name']);
     }
 
     // Process PAF file downloaded from remote Url
     if ($isPafFileUrl && !empty($values['paf_file_url'])) {
       $this->processPAfFile($pafFileUrl);
+      unlink($pafFileUrl);
     }
 
     CRM_Core_BAO_Setting::setItem($settingsStr,
@@ -351,7 +354,7 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
    * @param string $filePath
    */
   private function processPAfFile($filePath) {
-    CRM_Core_DAO::executeQuery("DELETE FROM paf_post_code_lookup");
+    CRM_Core_DAO::executeQuery("TRUNCATE TABLE paf_post_code_lookup");
     CRM_Core_DAO::executeQuery("
       LOAD DATA LOCAL INFILE '{$filePath}' 
       INTO TABLE paf_post_code_lookup

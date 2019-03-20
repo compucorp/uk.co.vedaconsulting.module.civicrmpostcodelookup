@@ -44,6 +44,14 @@ cj( document ).ready(function() {
   cj('input[name="import_method"]').click(function() {
     importMethodToggle();
   });
+
+  cj('#paf_file').change(function() {
+    var maxUploadFileSize = {/literal} {$maxFileSize} {literal}
+    if (this.files[0].size > maxUploadFileSize){
+      CRM.alert("This file exceeds the maximum upload size limit for this server", "Maximum Upload Size Limit", 'error');
+      this.value = "";
+    }
+  });
 });
 
 function hideAllFields() {
