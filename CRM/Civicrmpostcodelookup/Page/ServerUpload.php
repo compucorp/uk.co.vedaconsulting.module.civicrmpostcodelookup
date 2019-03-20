@@ -8,10 +8,10 @@ class CRM_Civicrmpostcodelookup_Page_ServerUpload extends CRM_Civicrmpostcodeloo
   public static function search() {
     $postcode = self::getPostcode(TRUE);
     $number = CRM_Utils_Request::retrieve('number', 'String');
-    $params = ['post_code' => ['LIKE' => "%{$postcode}%"]];
+    $params = ['post_code' => ['LIKE' => "{$postcode}%"]];
 
     if ($number) {
-      $params['building_number'] = ['LIKE' => "%{$number}%"];
+      $params['building_number'] = ['LIKE' => "{$number}%"];
     }
 
     $result = civicrm_api3('PafPostcodeLookup', 'get', $params);
