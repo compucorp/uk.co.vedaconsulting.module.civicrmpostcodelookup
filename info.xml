@@ -9,9 +9,8 @@
     <email>parvez@vedaconsulting.co.uk</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">https://civicrm.org/extensions/postcode-lookup-civicrm</url>
-    <url desc="Documentation">https://github.com/veda-consulting/uk.co.vedaconsulting.module.civicrmpostcodelookup/blob/master/README.md</url>
-    <url desc="Support">https://github.com/veda-consulting/uk.co.vedaconsulting.module.civicrmpostcodelookup</url>
+    <url desc="Main Extension Page">https://lab.civicrm.org/extensions/ukpostcodes</url>
+    <url desc="Support">https://lab.civicrm.org/extensions/ukpostcodes/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2019-06-06</releaseDate>

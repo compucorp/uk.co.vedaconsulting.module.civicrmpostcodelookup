@@ -1,4 +1,4 @@
-# Postcode lookup for CiviCRM #
+# Postcode lookup for CiviCRM
 
 ### Overview ###
 
@@ -14,8 +14,8 @@ For having postcode lookup feature in CiviCRM backend and Front end profiles.
 
 ### Installation ###
 
-* Install the extension manually in CiviCRM. More details [here](http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions#Extensions-Installinganewextension) about installing extensions in CiviCRM.
-* Configure postcode lookup provider details in Administer >> Postcode Lookup(civicrm/admin/postcodelookup/settings?reset=1)
+1. See: https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/#installing-a-new-extension
+1. Configure postcode lookup provider details in Administer >> Postcode Lookup(civicrm/admin/postcodelookup/settings?reset=1)
 
 ### Permissions ###
 
