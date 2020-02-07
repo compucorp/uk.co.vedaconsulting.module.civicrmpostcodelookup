@@ -39,7 +39,7 @@ function civicrmpostcodelookup_civicrm_xmlMenu(&$files) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
 function civicrmpostcodelookup_civicrm_install() {
-  CRM_Core_BAO_Setting::setItem('', 'CiviCRM Postcode Lookup', 'api_details');
+  \Civi::settings()->set('api_details', '');
   _civicrmpostcodelookup_civix_civicrm_install();
 }
 
@@ -149,7 +149,7 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
   ];
   if (in_array($formName, $postCodeLookupPages)) {
     // Assign the postcode lookup provider to form, so that we can call the related function in AJAX
-    $settingsStr = CRM_Core_BAO_Setting::getItem('CiviCRM Postcode Lookup', 'api_details');
+    $settingsStr = \Civi::settings()->get('api_details');
     $settingsArray = unserialize($settingsStr);
     $form->assign('civiPostCodeLookupProvider', $settingsArray['provider']);
 

@@ -11,7 +11,7 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
     #################
     #Server settings
     #################
-    $settingsStr = CRM_Core_BAO_Setting::getItem('CiviCRM Postcode Lookup', 'api_details');
+    $settingsStr = \Civi::settings()->get('api_details');
     $settingsArray = unserialize($settingsStr);
 
     $servertarget = $settingsArray['server'];
