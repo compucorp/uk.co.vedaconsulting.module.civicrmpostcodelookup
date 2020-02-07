@@ -8,10 +8,9 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
+
   function buildQuickForm() {
-
-    $settingsStr = CRM_Core_BAO_Setting::getItem('CiviCRM Postcode Lookup', 'api_details');
-
+    $settingsStr = \Civi::settings()->get('api_details');
     $settingsArray = unserialize($settingsStr);
 
     // Postcode loookup Provider
@@ -200,11 +199,7 @@ class CRM_Civicrmpostcodelookup_Form_Setting extends CRM_Core_Form {
     }
 
     $settingsStr = serialize($settingsArray);
-
-    CRM_Core_BAO_Setting::setItem($settingsStr,
-      'CiviCRM Postcode Lookup',
-      'api_details'
-    );
+    \Civi::settings()->set('api_details', $settingsStr);
 
     $message = "Settings saved.";
     CRM_Core_Session::setStatus($message, 'Postcode Lookup', 'success');

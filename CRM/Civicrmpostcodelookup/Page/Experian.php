@@ -11,7 +11,7 @@ class CRM_PostcodeLookup_Page_Ajax extends CRM_Civicrmpostcodelookup_Page_Postco
   public static function getQasCredentials($account_type) {
     $credentials = [];
 
-    $settingsStr = CRM_Core_BAO_Setting::getItem('CiviCRM Postcode Lookup', 'api_details');
+    $settingsStr = \Civi::settings()->get('api_details');
     $settingsArray = unserialize($settingsStr);
 
     $credentials['username'] = $settingsArray['username'];
