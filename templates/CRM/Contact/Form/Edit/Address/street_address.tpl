@@ -28,7 +28,6 @@
   <td colspan="2">
     <label for="addressLookup">Search for an address</label><br>
     <input placeholder="Start typing a postcode" name="inputPostCode_{$blockId}" id ="inputPostCode_{$blockId}">
-    &nbsp;&nbsp;<img id="loaderimage_{$blockId}" src="{$config->resourceBase}i/loading.gif" style="width:15px;height:15px; display: none" />
   </td>
 </tr>
 

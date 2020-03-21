@@ -152,12 +152,9 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
     $settingsStr = \Civi::settings()->get('api_details');
     $settingsArray = unserialize($settingsStr);
     $form->assign('civiPostCodeLookupProvider', $settingsArray['provider']);
-
-    //MV#4367, assign location types value from settings to tpl/js
-    if (!empty($settingsArray['location_type_id'])) {
-      $form->assign('civiPostCodeLookupLocationType', $settingsArray['location_type_id']);
-      $form->assign('civiPostCodeLookupLocationTypeJson', json_encode($settingsArray['location_type_id']));
-    }
+    $settingsArray['location_type_id'] = $settingsArray['location_type_id'] ?? [];
+    $settingsArray['location_type_id'][] = 'Primary';
+    $form->assign('civiPostCodeLookupLocationTypeJson', json_encode($settingsArray['location_type_id']));
   }
 }
 
