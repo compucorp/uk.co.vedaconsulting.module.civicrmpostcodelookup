@@ -56,4 +56,14 @@
      <page_callback>CRM_Civicrmpostcodelookup_Page_GetAddressIo::getaddress</page_callback>
      <access_arguments>access postcode lookup</access_arguments>
   </item>
+  <item>
+    <path>civicrm/serverupload/ajax/search</path>
+    <page_callback>CRM_Civicrmpostcodelookup_Page_ServerUpload::search</page_callback>
+    <access_arguments>access postcode lookup</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/serverupload/ajax/get</path>
+    <page_callback>CRM_Civicrmpostcodelookup_Page_ServerUpload::getaddress</page_callback>
+    <access_arguments>access postcode lookup</access_arguments>
+  </item>
 </menu>
