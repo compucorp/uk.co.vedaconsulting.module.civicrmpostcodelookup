@@ -19,6 +19,7 @@
   <compatibility>
     <ver>5.19</ver>
   </compatibility>
+  <comments>Patch 1</comments>
   <comments>Developed by Veda NFP Consulting LTD.</comments>
   <civix>
     <namespace>CRM/Civicrmpostcodelookup</namespace>

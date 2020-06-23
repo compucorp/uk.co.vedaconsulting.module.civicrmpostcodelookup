@@ -114,6 +114,7 @@
     var streetAddressElement = '#address_'+ blockNo +'_street_address';
     var AddstreetAddressElement = '#address_'+ blockNo +'_supplemental_address_1';
     var AddstreetAddressElement1 = '#address_'+ blockNo +'_supplemental_address_2';
+    var AddstreetAddressElement2 = '#address_'+ blockNo +'_supplemental_address_3';
     var cityElement = '#address_'+ blockNo +'_city';
     var countyElement = '#address_'+ blockNo +'_state_province_id';
 
@@ -136,6 +137,53 @@
       }
     }
     else {
+      if(typeof address.supplemental_address_3 == 'undefined')
+        address.supplemental_address_3 = '';
+      var addr = [];
+      if(address.supplemental_address_1.length == 0 &&
+              address.supplemental_address_2.length == 0 &&
+              address.supplemental_address_3.length == 0) {
+        addr = address.street_address.split(",");
+        if(addr.length) {
+          address.street_address = addr.shift();
+        }
+        if(addr.length) {
+          address.supplemental_address_1 = addr.shift();
+        }
+        if(addr.length) {
+          address.supplemental_address_2 = addr.shift();
+        }
+        if(addr.length) {
+          address.supplemental_address_3 = addr.join(', ');
+        }
+      }
+      else if (address.supplemental_address_2.length == 0 &&
+              address.supplemental_address_3.length == 0) {
+        addr = address.street_address.split(",");
+        if(addr.length) {
+          address.street_address = addr.shift();
+        }
+        if(addr.length) {
+          address.supplemental_address_2 = address.supplemental_address_1;
+          address.supplemental_address_1 = addr.shift();
+        }
+        if(addr.length) {
+          address.supplemental_address_3 = address.supplemental_address_2;
+          address.supplemental_address_2 = addr.join(', ');
+        }
+      }
+      else if (address.supplemental_address_3.length == 0) {
+        addr = address.street_address.split(",");
+        if(addr.length) {
+          address.street_address = addr.shift();
+        }
+        if(addr.length) {
+          address.supplemental_address_3 = address.supplemental_address_2;
+          address.supplemental_address_2 = address.supplemental_address_1;
+          address.supplemental_address_1 = addr.join(', ');
+        }
+      }
+
       cj(streetAddressElement).val('');
       cj(AddstreetAddressElement).val('');
       cj(AddstreetAddressElement1).val('');
@@ -146,6 +194,7 @@
       cj(streetAddressElement).val(address.street_address);
       cj(AddstreetAddressElement).val(address.supplemental_address_1);
       cj(AddstreetAddressElement1).val(address.supplemental_address_2);
+      cj(AddstreetAddressElement2).val(address.supplemental_address_3);
       cj(cityElement).val(address.town);
       cj(postcodeElement).val(address.postcode);
       if(typeof(address.state_province_id) != "undefined" && address.state_province_id !== null) {

@@ -119,8 +119,12 @@
       var streetAddressElement = '#' + blockPrefix + 'street_address-'+ blockNo;
       var AddstreetAddressElement = '#' + blockPrefix + 'supplemental_address_1-'+ blockNo;
       var AddstreetAddressElement1 = '#' + blockPrefix + 'supplemental_address_2-'+ blockNo;
+      var AddstreetAddressElement2 = '#' + blockPrefix + 'supplemental_address_3-'+ blockNo;
       var cityElement = '#' + blockPrefix + 'city-'+ blockNo;
-      var countyElement = '#address_'+ blockNo +'_state_province_id';
+      var countyElement = '#' + blockPrefix +'state_province-'+ blockNo;
+      if(cj('#' + blockPrefix +'state_province_id-'+ blockNo).length) {
+        countyElement =  '#' + blockPrefix +'state_province_id-'+ blockNo;
+      }
 
       var allFields = {
         postcode: postcodeElement,
@@ -141,6 +145,53 @@
         }
       }
       else {
+        if(typeof address.supplemental_address_3 == 'undefined')
+          address.supplemental_address_3 = '';
+        var addr = [];
+        if(address.supplemental_address_1.length == 0 &&
+                address.supplemental_address_2.length == 0 &&
+                address.supplemental_address_3.length == 0) {
+          addr = address.street_address.split(",");
+          if(addr.length) {
+            address.street_address = addr.shift();
+          }
+          if(addr.length) {
+            address.supplemental_address_1 = addr.shift();
+          }
+          if(addr.length) {
+            address.supplemental_address_2 = addr.shift();
+          }
+          if(addr.length) {
+            address.supplemental_address_3 = addr.join(', ');
+          }
+        }
+        else if (address.supplemental_address_2.length == 0 &&
+                address.supplemental_address_3.length == 0) {
+          addr = address.street_address.split(",");
+          if(addr.length) {
+            address.street_address = addr.shift();
+          }
+          if(addr.length) {
+            address.supplemental_address_2 = address.supplemental_address_1;
+            address.supplemental_address_1 = addr.shift();
+          }
+          if(addr.length) {
+            address.supplemental_address_3 = address.supplemental_address_2;
+            address.supplemental_address_2 = addr.join(', ');
+          }
+        }
+        else if (address.supplemental_address_3.length == 0) {
+          addr = address.street_address.split(",");
+          if(addr.length) {
+            address.street_address = addr.shift();
+          }
+          if(addr.length) {
+            address.supplemental_address_3 = address.supplemental_address_2;
+            address.supplemental_address_2 = address.supplemental_address_1;
+            address.supplemental_address_1 = addr.join(', ');
+          }
+        }
+
         $(streetAddressElement).val('');
         $(AddstreetAddressElement).val('');
         $(AddstreetAddressElement1).val('');
@@ -151,6 +202,7 @@
         $(streetAddressElement).val(address.street_address);
         $(AddstreetAddressElement).val(address.supplemental_address_1);
         $(AddstreetAddressElement1).val(address.supplemental_address_2);
+        $(AddstreetAddressElement2).val(address.supplemental_address_3);
         $(cityElement).val(address.town);
         $(postcodeElement).val(address.postcode);
         if (typeof(address.state_province_id) !== 'undefined' && address.state_province_id !== null) {
