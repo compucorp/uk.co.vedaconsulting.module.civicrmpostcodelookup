@@ -10,6 +10,10 @@
     // Location Types from settings
     if (locationTypes) {
       $.each(locationTypes, function (id, index) {
+        if (index == 'Primary') {
+          id = 'Primary';
+        }
+
         addressSelector = '#editrow-street_address-' + id;
         if ($(addressSelector).length > 0) {
           blockId = id;
