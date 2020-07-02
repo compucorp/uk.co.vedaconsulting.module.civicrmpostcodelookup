@@ -10,6 +10,10 @@
     // Location Types from settings
     if (locationTypes) {
       $.each(locationTypes, function (id, index) {
+        if (index == 'Primary') {
+          id = 'Primary';
+        }
+
         addressSelector = '#editrow-street_address-' + id;
         if ($(addressSelector).length > 0) {
           blockId = id;
@@ -119,14 +123,19 @@
       var streetAddressElement = '#' + blockPrefix + 'street_address-'+ blockNo;
       var AddstreetAddressElement = '#' + blockPrefix + 'supplemental_address_1-'+ blockNo;
       var AddstreetAddressElement1 = '#' + blockPrefix + 'supplemental_address_2-'+ blockNo;
+      var AddstreetAddressElement2 = '#' + blockPrefix + 'supplemental_address_3-'+ blockNo;
       var cityElement = '#' + blockPrefix + 'city-'+ blockNo;
-      var countyElement = '#address_'+ blockNo +'_state_province_id';
+      var countyElement = '#' + blockPrefix +'state_province-'+ blockNo;
+      if(cj('#' + blockPrefix +'state_province_id-'+ blockNo).length) {
+        countyElement =  '#' + blockPrefix +'state_province_id-'+ blockNo;
+      }
 
       var allFields = {
         postcode: postcodeElement,
         line1: streetAddressElement,
         line2: AddstreetAddressElement,
         line3: AddstreetAddressElement1,
+        line4: AddstreetAddressElement2,
         city: cityElement
       };
 
@@ -144,6 +153,7 @@
         $(streetAddressElement).val('');
         $(AddstreetAddressElement).val('');
         $(AddstreetAddressElement1).val('');
+        $(AddstreetAddressElement2).val('');
         $(cityElement).val('');
         $(postcodeElement).val('');
         $(countyElement).val('');
@@ -151,6 +161,7 @@
         $(streetAddressElement).val(address.street_address);
         $(AddstreetAddressElement).val(address.supplemental_address_1);
         $(AddstreetAddressElement1).val(address.supplemental_address_2);
+        $(AddstreetAddressElement2).val(address.supplemental_address_3);
         $(cityElement).val(address.town);
         $(postcodeElement).val(address.postcode);
         if (typeof(address.state_province_id) !== 'undefined' && address.state_province_id !== null) {
@@ -162,6 +173,7 @@
         $(streetAddressElement).trigger("change");
         $(AddstreetAddressElement).trigger("change");
         $(AddstreetAddressElement1).trigger("change");
+        $(AddstreetAddressElement2).trigger("change");
         $(cityElement).trigger("change");
         $(postcodeElement).trigger("change");
         $(countyElement).trigger("change");

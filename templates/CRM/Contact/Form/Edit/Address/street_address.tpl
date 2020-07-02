@@ -114,6 +114,7 @@
     var streetAddressElement = '#address_'+ blockNo +'_street_address';
     var AddstreetAddressElement = '#address_'+ blockNo +'_supplemental_address_1';
     var AddstreetAddressElement1 = '#address_'+ blockNo +'_supplemental_address_2';
+    var AddstreetAddressElement2 = '#address_'+ blockNo +'_supplemental_address_3';
     var cityElement = '#address_'+ blockNo +'_city';
     var countyElement = '#address_'+ blockNo +'_state_province_id';
 
@@ -122,6 +123,7 @@
       line1: streetAddressElement,
       line2: AddstreetAddressElement,
       line3: AddstreetAddressElement1,
+      line4: AddstreetAddressElement2,
       city: cityElement
     };
 
@@ -139,6 +141,7 @@
       cj(streetAddressElement).val('');
       cj(AddstreetAddressElement).val('');
       cj(AddstreetAddressElement1).val('');
+      cj(AddstreetAddressElement2).val('');
       cj(cityElement).val('');
       cj(postcodeElement).val('');
       cj(countyElement).val('');
@@ -146,6 +149,7 @@
       cj(streetAddressElement).val(address.street_address);
       cj(AddstreetAddressElement).val(address.supplemental_address_1);
       cj(AddstreetAddressElement1).val(address.supplemental_address_2);
+      cj(AddstreetAddressElement2).val(address.supplemental_address_3);
       cj(cityElement).val(address.town);
       cj(postcodeElement).val(address.postcode);
       if(typeof(address.state_province_id) != "undefined" && address.state_province_id !== null) {

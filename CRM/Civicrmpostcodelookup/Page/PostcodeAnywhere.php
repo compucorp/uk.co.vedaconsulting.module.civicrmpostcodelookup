@@ -114,29 +114,44 @@ class CRM_Civicrmpostcodelookup_Page_PostcodeAnywhere extends CRM_Civicrmpostcod
     //Make the request to Postcode Anywhere and parse the XML returned
     $simpleXMLData = simplexml_load_file($querystring);
 
-    $address = ['id' => $moniker];
     $addressItemRow = (array) $simpleXMLData->Rows;
     $addressItem = (array) $addressItemRow['Row'];
 
-    $addressLineArray[] = $addressItem['@attributes']['Company'];
-    $addressLineArray[] = $addressItem['@attributes']['Line1'];
-    $addressLineArray[] = $addressItem['@attributes']['Line2'];
-    $addressLineArray[] = $addressItem['@attributes']['Line3'];
-    $addressLineArray[] = $addressItem['@attributes']['Line4'];
-    $addressLineArray[] = $addressItem['@attributes']['Line5'];
-    $addressLineArray = array_filter($addressLineArray);
-    $address["street_address"] = @implode(', ', $addressLineArray);
+    $providerAddressLineKeys = ['Company', 'Line1', 'Line2', 'Line3', 'Line4', 'Line5'];
+    $civiAdressLinesKeys = ['street_address', 'supplemental_address_1', 'supplemental_address_2'];
 
-    $address["supplemental_address_1"] = $addressItem['@attributes']['SecondaryStreet'];
-    $address["supplemental_address_2"] = $addressItem['@attributes']['DependentLocality'];
+    $address = ['id' => $moniker];
+    foreach ($civiAdressLinesKeys as $civiAdressLinesKey) {
+      $address[$civiAdressLinesKey] = '';
+      foreach ($providerAddressLineKeys as $index => $providerKey) {
+        unset($providerAddressLineKeys[$index]);
+        if (!empty($addressItem['@attributes'][$providerKey])) {
+          $address[$civiAdressLinesKey] = $addressItem['@attributes'][$providerKey];
+          break;
+        }
+      }
+    }
 
-    $address["town"] = $addressItem['@attributes']['PostTown'];
+    $address['supplemental_address_3'] = '';
+    foreach ($providerAddressLineKeys as $providerKey) {
+      if (!empty($addressItem['@attributes'][$providerKey])) {
+        $address['supplemental_address_3'] .= $addressItem['@attributes'][$providerKey] . ', ' ;
+      }
+    }
+    $address['supplemental_address_3']= trim($address['supplemental_address_3'], ', ');
 
-    $address["postcode"] = $addressItem['@attributes']['Postcode'];
+    $address['town'] = $addressItem['@attributes']['PostTown'];
+    $address['postcode'] = $addressItem['@attributes']['Postcode'];
 
-    $address["state_province_id"] = '';
+    $address['state_province_id'] = '';
+    $address['state_province_abbreviation'] = '';
     if ($stateId = array_search($addressItem['@attributes']['County'], $states)) {
-      $address["state_province_id"] = $stateId;
+      $address['state_province_id'] = $stateId;
+
+      $address['state_province_abbreviation'] = civicrm_api3('StateProvince', 'getvalue', [
+        'return' => 'abbreviation',
+        'id' => $stateId,
+      ]);
     }
 
     return $address;
