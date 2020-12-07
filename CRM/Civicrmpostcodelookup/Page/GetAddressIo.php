@@ -159,7 +159,7 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
           break;
       }
     }
-    elseif (curl_errno($curlSession)) {
+    elseif (!empty($curlError['code'])) {
       // Log & return error
       $addressData['is_error'] = 1;
       Civi::log()->debug('GetAddressIo cURL error: ' . print_r($curlError, TRUE));
