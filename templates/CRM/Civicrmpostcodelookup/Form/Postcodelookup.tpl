@@ -1,97 +1,67 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var locationTypes = {/literal}{$civiPostCodeLookupLocationTypeJson}{literal};
+    var addressSelectors = {/literal}{$ukpostcodesAddressSelectors}{literal};
     var blockId = '';
     var blockNo = '';
-    var addressSelector = '';
     var postCodeHtml = '';
 
     // Location Types from settings
-    if (locationTypes) {
-      $.each(locationTypes, function (id, index) {
-        addressSelector = '#editrow-street_address-' + id;
-        if ($(addressSelector).length > 0) {
-          blockId = id;
-          blockNo = id;
-          postCodeHtml = '<div class="crm-section addressLookup form-item"><div class="label"><label for="addressLookup">Search for an address</label></div><div class="edit-value content"><div class="postcodelookup-textbox-wrapper"><input placeholder="Start typing a postcode" name="inputPostCode_' + blockId + '" id ="inputPostCode_' + blockId + '" style="width: 25em;"></div></div><div class="clear"></div></div>';
-          if ($('#inputPostCode_' + blockId).length === 0) {
-            $(addressSelector).before(postCodeHtml);
+    if (addressSelectors) {
+      $.each(addressSelectors, function(id, address) {
+        if ($(address.selector).length > 0) {
+          blockId = address.prefix + address.id;
+          var postcodeElement = 'inputPostCode_' + blockId;
+          postCodeHtml = '' +
+                  '<div class="crm-section addressLookup form-item">' +
+                    '<div class="label">' +
+                      '<label for="addressLookup">Search for an address</label>' +
+                    '</div>' +
+                    '<div class="edit-value content">' +
+                      '<div class="postcodelookup-textbox-wrapper">' +
+                        '<input placeholder="Start typing a postcode" name="' + postcodeElement + '" id="' + postcodeElement + '" class="crm-postcodelookup ui-autocomplete-input" style="width: 25em;">' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="clear" />' +
+                  '</div>';
+          if ($('#' + postcodeElement).length === 0) {
+            $(address.beforeSelector).before(postCodeHtml);
+
+            var minCharacters = 4;
+
+            var postcodeProvider = '{/literal}{$civiPostCodeLookupProvider}{literal}';
+            if (postcodeProvider !== 'civipostcode') {
+              $(postcodeElement).attr("placeholder", "Type full postcode to find addresses");
+              minCharacters = 5;
+            }
+
+            var sourceUrl = CRM.url('civicrm/{/literal}{$civiPostCodeLookupProvider}{literal}/ajax/search', {"json": 1});
+
+            $('#' + postcodeElement).autocomplete({
+              source: sourceUrl,
+              minLength: minCharacters,
+              data: {postcode: $('#' + postcodeElement).val(), mode: '0'},
+              search: function(event, ui) {
+                $('#loaderimage_' + blockNo).show();
+              },
+              response: function( event, ui ) {
+                $('#loaderimage_' + blockNo).hide();
+              },
+              select: function(event, ui) {
+                if (ui.item.id !== '') {
+                  findAddressValues(ui.item.id, address.id, address.prefix);
+                  $('#loaderimage_' + blockNo).show();
+                }
+                return false;
+              },
+              html: true, // optional (jquery.ui.autocomplete.html.js required)
+
+              //optional (if other layers overlap autocomplete list)
+              open: function(event, ui) {
+                $(".ui-autocomplete").css("z-index", 1000);
+              }
+            });
           }
-        }
-      });
-    }
-
-    // Include lookup in billing section as well
-    if ($('#billing_street_address-5').length > 0) {
-      var billingblockId = '5';
-      var billingblockNo = '5';
-      var billingpostCodeHtml = '<div class="crm-section addressLookup form-item"><div class="label"><label for="addressLookup">Search for an address</label></div><div class="edit-value content"><div class="postcodelookup-textbox-wrapper"><input placeholder="Start typing a postcode" name="inputPostCodeBillingSection_' + billingblockId + '" id ="inputPostCodeBillingSection_' + billingblockId + '" style="width: 25em;"></div></div><div class="clear"></div></div>';
-      $('.billing_street_address-5-section').before(billingpostCodeHtml);
-      var billingPostcodeElement = '#inputPostCodeBillingSection_'+billingblockNo;
-    }
-
-    var houseElement = '#inputNumber_'+blockNo;
-    var postcodeElement = '#inputPostCode_'+blockNo;
-    var minCharacters = 4;
-
-    var postcodeProvider = '{/literal}{$civiPostCodeLookupProvider}{literal}';
-    if (postcodeProvider !== 'civipostcode') {
-      $(postcodeElement).attr("placeholder", "Type full postcode to find addresses");
-      minCharacters = 5;
-    }
-
-    var sourceUrl = CRM.url('civicrm/{/literal}{$civiPostCodeLookupProvider}{literal}/ajax/search', {"json": 1});
-
-    $(postcodeElement).autocomplete({
-      source: sourceUrl,
-      minLength: minCharacters,
-      data: {postcode: $( postcodeElement ).val(), number: $(houseElement).val(), mode: '0'},
-      search: function( event, ui ) {
-        $('#loaderimage_'+blockNo).show();
-      },
-      response: function( event, ui ) {
-        $('#loaderimage_'+blockNo).hide();
-      },
-      select: function(event, ui) {
-        if (ui.item.id !== '') {
-          findAddressValues(ui.item.id, blockNo, blockPrefix = '');
-          $('#loaderimage_'+blockNo).show();
-        }
-        return false;
-      },
-      html: true, // optional (jquery.ui.autocomplete.html.js required)
-
-      //optional (if other layers overlap autocomplete list)
-      open: function(event, ui) {
-        $(".ui-autocomplete").css("z-index", 1000);
-      }
-    });
-
-    // Postcode lookup in billing section
-    if ($('#billing_street_address-5').length > 0 ) {
-      $(billingPostcodeElement).autocomplete({
-        source: sourceUrl,
-        minLength: minCharacters,
-        data: {postcode: $( billingPostcodeElement ).val(), number: $(houseElement).val(), mode: '0'},
-        search: function( event, ui ) {
-          $('#loaderimage_'+blockNo).show();
-        },
-        response: function( event, ui ) {
-          $('#loaderimage_'+blockNo).hide();
-        },
-        select: function(event, ui) {
-          if (ui.item.id !== '') {
-            findAddressValues(ui.item.id, '5', blockPrefix = 'billing_');
-            $('#loaderimage_'+blockNo).show();
-          }
-          return false;
-        },
-        html: true, // optional (jquery.ui.autocomplete.html.js required)
-
-        //optional (if other layers overlap autocomplete list)
-        open: function(event, ui) {
-          $(".ui-autocomplete").css("z-index", 1000);
         }
       });
     }
@@ -121,6 +91,10 @@
       var AddstreetAddressElement1 = '#' + blockPrefix + 'supplemental_address_2-'+ blockNo;
       var cityElement = '#' + blockPrefix + 'city-'+ blockNo;
       var countyElement = '#address_'+ blockNo +'_state_province_id';
+      var countryElement = '#' + blockPrefix + 'country_id-' + blockNo;
+      if ($(countryElement).length === 0) {
+        countryElement = '#' + blockPrefix + 'country-' + blockNo;
+      }
 
       var allFields = {
         postcode: postcodeElement,
@@ -153,6 +127,7 @@
         $(AddstreetAddressElement1).val(address.supplemental_address_2);
         $(cityElement).val(address.town);
         $(postcodeElement).val(address.postcode);
+        $(countryElement).val("1226").trigger('change');
         if (typeof(address.state_province_id) !== 'undefined' && address.state_province_id !== null) {
           $(countyElement).val(address.state_province_id);
         }

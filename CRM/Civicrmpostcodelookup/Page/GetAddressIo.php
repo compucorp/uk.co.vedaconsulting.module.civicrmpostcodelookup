@@ -176,8 +176,8 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
   /**
    * Format the list of found addresses
    *
-   * @param $addressData
-   * @param $postcode Full postcode, without space
+   * @param array $addressData
+   * @param string Full postcode, without space
    *
    * @return array
    */

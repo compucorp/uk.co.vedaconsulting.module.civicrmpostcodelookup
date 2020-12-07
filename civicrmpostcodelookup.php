@@ -153,8 +153,31 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
     $settingsArray = unserialize($settingsStr);
     $form->assign('civiPostCodeLookupProvider', $settingsArray['provider']);
     $settingsArray['location_type_id'] = $settingsArray['location_type_id'] ?? [];
-    $settingsArray['location_type_id'][] = 'Primary';
-    $form->assign('civiPostCodeLookupLocationTypeJson', json_encode($settingsArray['location_type_id']));
+    $settingsArray['location_type_id']['Primary'] = 1;
+    foreach ($settingsArray['location_type_id'] as $location => $_) {
+      $addressSelectors[] = [
+        'id' => $location,
+        'prefix' => '',
+        'selector' => "#editrow-street_address-{$location}",
+        'beforeSelector' => ".crm-profile #editrow-street_address-{$location}",
+      ];
+      // On behalf of address
+      $addressSelectors[] = [
+        'id' => $location,
+        'prefix' => 'onbehalf_',
+        'selector' => "#onbehalf_street_address-{$location}",
+        'beforeSelector' => "div#on-behalf-block fieldset div#editrow-street_address-{$location}",
+      ];
+    }
+    // Billing address
+    $addressSelectors[] = [
+      'id' => '5',
+      'prefix' => 'billing_',
+      'selector' => '#billing_street_address-5',
+      'beforeSelector' => '.billing_street_address-5-section',
+    ];
+
+    $form->assign('ukpostcodesAddressSelectors', json_encode($addressSelectors));
   }
 }
 
