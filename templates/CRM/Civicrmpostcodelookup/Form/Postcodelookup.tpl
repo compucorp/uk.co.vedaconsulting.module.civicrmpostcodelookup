@@ -1,3 +1,13 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
@@ -41,16 +51,9 @@
               source: sourceUrl,
               minLength: minCharacters,
               data: {postcode: $('#' + postcodeElement).val(), mode: '0'},
-              search: function(event, ui) {
-                $('#loaderimage_' + blockNo).show();
-              },
-              response: function( event, ui ) {
-                $('#loaderimage_' + blockNo).hide();
-              },
               select: function(event, ui) {
                 if (ui.item.id !== '') {
                   findAddressValues(ui.item.id, address.id, address.prefix);
-                  $('#loaderimage_' + blockNo).show();
                 }
                 return false;
               },
@@ -67,7 +70,6 @@
     }
 
     function findAddressValues(id , blockNo, blockPrefix) {
-      $('#loaderimage_'+blockNo).show();
       setAddressFields(false, blockNo, blockPrefix);
       var sourceUrl = CRM.url('civicrm/{/literal}{$civiPostCodeLookupProvider}{literal}/ajax/get', {"json": 1});
       $.ajax({
@@ -77,9 +79,6 @@
         success: function (data) {
           setAddressFields(data.address, blockNo, blockPrefix);
           setAddressFields(true, blockNo, blockPrefix);
-        },
-        complete: function (data) {
-          $('#loaderimage_'+blockNo).hide();
         }
       });
     }
@@ -104,8 +103,8 @@
         city: cityElement
       };
 
-      if(address === true) {
-        for(var field in allFields) {
+      if (address === true) {
+        for (var field in allFields) {
           $(allFields[field]).removeAttr('disabled');
         }
       }
@@ -122,24 +121,35 @@
         $(postcodeElement).val('');
         $(countyElement).val('');
 
+        if (($(AddstreetAddressElement1).length === 0) && (typeof address.supplemental_address_2 !== 'undefined')) {
+          if (typeof address.supplemental_address_1 !== 'undefined') {
+            address.supplemental_address_1 = address.supplemental_address_1 + ', ';
+          }
+          address.supplemental_address_1 = address.supplemental_address_1 + address.supplemental_address_2;
+        }
+        if (($(AddstreetAddressElement).length === 0) && (typeof address.supplemental_address_1 !== 'undefined')) {
+          address.street_address = address.street_address + ', ' + address.supplemental_address_1;
+        }
+
         $(streetAddressElement).val(address.street_address);
         $(AddstreetAddressElement).val(address.supplemental_address_1);
         $(AddstreetAddressElement1).val(address.supplemental_address_2);
         $(cityElement).val(address.town);
         $(postcodeElement).val(address.postcode);
-        $(countryElement).val("1226").trigger('change');
+        $(countryElement).val('1226'); // United Kingdom
         if (typeof(address.state_province_id) !== 'undefined' && address.state_province_id !== null) {
           $(countyElement).val(address.state_province_id);
         }
 
         // Trigger change on all the elements we touch so that other functions can react
         //   eg. a checkbox for "My billing address is the same".
-        $(streetAddressElement).trigger("change");
-        $(AddstreetAddressElement).trigger("change");
-        $(AddstreetAddressElement1).trigger("change");
-        $(cityElement).trigger("change");
-        $(postcodeElement).trigger("change");
-        $(countyElement).trigger("change");
+        $(streetAddressElement).trigger('change');
+        $(AddstreetAddressElement).trigger('change');
+        $(AddstreetAddressElement1).trigger('change');
+        $(cityElement).trigger('change');
+        $(postcodeElement).trigger('change');
+        $(countryElement).trigger('change')
+        $(countyElement).trigger('change');
       }
     }
   });

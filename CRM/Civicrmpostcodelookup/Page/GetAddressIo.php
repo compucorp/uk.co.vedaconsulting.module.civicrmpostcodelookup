@@ -18,20 +18,22 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     if (!self::isValidPostcode($postcode)) {
       exit;
     }
-    $number = CRM_Utils_Request::retrieve('number', 'String');
-    $apiUrl = self::getAddressIoApiUrl($postcode, $number);
-    // get address result from getAddress.io
-    $addressData = self::addressAPIResult($apiUrl);
 
-    $addresslist = [];
-    if ($addressData['is_error']) {
-      $addresslist[0]['value'] = '';
-      $addresslist[0]['label'] = CRM_Utils_Array::value('Message', $addressData, 'Error in fetching address');
-    } else {
-      $addresslist = self::getAddressList($addressData, $postcode);
+    $addressList = \Civi::cache('long')->get("ukpostcodes_{$postcode}") ?? NULL;
+    if (!isset($addressList)) {
+      // get address result from getAddress.io
+      $apiUrl = self::getAddressIoApiUrl($postcode);
+      $addressData = self::addressAPIResult($apiUrl);
+      if ($addressData['is_error']) {
+        $addressList[0]['value'] = '';
+        $addressList[0]['label'] = CRM_Utils_Array::value('Message', $addressData, 'Error in fetching address');
+      } else {
+        $addressList = self::getAddressList($addressData, $postcode);
+      }
+      \Civi::cache('long')->set("ukpostcodes_{$postcode}", $addressList);
     }
 
-    echo json_encode($addresslist);
+    echo json_encode($addressList);
     exit;
   }
 
@@ -46,27 +48,17 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
 
     // get postcode & address key from selectedId
     $selectedResult = explode('_', $selectedId);
-    $postcode = $selectedResult[0];
+    $postcode = CRM_Civicrmpostcodelookup_Page_Civipostcode::format($selectedResult[0], FALSE);
     $addressKey = $selectedResult[1];
 
-    $apiUrl = self::getAddressIoApiUrl(self::format($postcode, FALSE));
+    $addressList = \Civi::cache('long')->get("ukpostcodes_{$postcode}") ?? NULL;
 
-    // get address result from getAddress.io
-    $addressData = self::addressAPIResult($apiUrl);
+    // selected result from the addressItems
+    $addressItem = $addressList[$addressKey];
 
-    $addresslist = [];
-    if ($addressData['is_error']) {
-      $address = [];
-    } else {
-      $addressItems = $addressData['addresses'];
-
-      // selected result from the addressItems
-      $addressItem = $addressItems[$addressKey];
-
-      $address = self::formatAddressLines($selectedId, $addressItem);
-      // Fix me : postcode not returned in the API result, hence using the one from the selected ID
-      $address['postcode'] = $postcode;
-    }
+    $address = $addressItem['lineArray'];
+    // Fix me : postcode not returned in the API result, hence using the one from the selected ID
+    $address['postcode'] = $postcode;
 
     $response = [
       'address' => $address
@@ -103,7 +95,7 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
 
     $apiKey = $settingsArray['api_key'];
 
-    $querystring = "api-key=$apiKey";
+    $querystring = "api-key=$apiKey&expand=true";
     return $servertarget ."?" . $querystring;
   }
 
@@ -200,12 +192,13 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       // FIX me : There is no address id found in th API, hence assigning combination of postcode & arrayresultID as rowId inorder to get the selected address later
       $addressId = $postcode . '_' . $key;
 
-      $addressLineArray = self::formatAddressLines($addressId, $addressItem, TRUE);
+      $addressLineArray = self::formatAddressLines($addressId, $addressItem);
       $addressLineArray['postcode'] = $postcode;
 
       $addressRow["id"] = $addressId;
       $addressRow["value"] = $postcode;
-      $addressRow["label"] = @implode(', ', $addressLineArray);;
+      $addressRow["label"] = @implode(', ', $addressLineArray);
+      $addressRow['lineArray'] = $addressLineArray;
       array_push($addressList, $addressRow);
     }
 
@@ -219,49 +212,40 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     return $addressList;
   }
 
-  private static function formatAddressLines($addressId, $addressItem, $forList = FALSE) {
-
+  private static function formatAddressLines($addressId, $addressItem) {
     if (empty($addressItem)) {
       return;
     }
 
-    $addressLines = explode(', ', $addressItem);
-
-    if ($forList == FALSE) {
-      $address = ['id' => $addressId];
+    if (!empty($addressItem->line_1)) {
+      $address['street_address'] = $addressItem->line_1;
     }
-    if (!empty($addressLines[0])) {
-      $address["street_address"] = $addressLines[0];
+    if (!empty($addressItem->line_2)) {
+      $address['supplemental_address_1'] = $addressItem->line_2;
+    };
+    if (!empty($addressItem->line_3)) {
+      $address['supplemental_address_2'] = $addressItem->line_2;
     }
-    if (!empty($addressLines[1])) {
-      $address["supplemental_address_1"] = $addressLines[1];
-    }
-    if (!empty($addressLines[2])) {
-      $address["supplemental_address_2"] = $addressLines[2];
-    }
-    if (!empty($addressLines[5])) {
-      $address["town"] = $addressLines[5];
+    if (!empty($addressItem->town_or_city)) {
+      $address['city'] = $addressItem->town_or_city;
     }
 
     // Get state/county
-    $states = CRM_Core_PseudoConstant::stateProvince();
-
-    $address["state_province_id"] = '';
-    if (!empty($addressLines[6])) {
-
-      $stateId = array_search($addressLines[6], $states);
-
-      if ($stateId) {
-        if ($forList) {
-          // Display actual state name in selection list
-          $address['state_province_id'] = $addressLines[6];
-        }
-        else {
-          // Use state ID when returning to fill in details (via a select2)
-          $address["state_province_id"] = $stateId;
-        }
-      }
+    if (!isset(\Civi::$statics[__FUNCTION__]['stateprovince'])) {
+      \Civi::$statics[__FUNCTION__]['stateprovince'] = CRM_Core_PseudoConstant::stateProvince();
     }
+
+    $address['state_province_id'] = '';
+    if (!empty($addressItem->county)) {
+      $stateProvinceID = array_search($addressItem->county, \Civi::$statics[__FUNCTION__]['stateprovince']);
+
+      if ($stateProvinceID) {
+        // Display actual state name in selection list
+        $address['state_province_id'] = $stateProvinceID;
+      }
+      $address['state_province'] = $addressItem->county;
+    }
+    $address['country_id'] = 1226;
 
     return $address;
   }

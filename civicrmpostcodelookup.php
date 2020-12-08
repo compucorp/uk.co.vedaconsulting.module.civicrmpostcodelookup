@@ -138,7 +138,7 @@ function civicrmpostcodelookup_civicrm_navigationMenu(&$menu) {
 
 function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
   $postCodeLookupPages = [
-    'CRM_Contact_Form_Contact'
+      'CRM_Contact_Form_Contact'
     , 'CRM_Contact_Form_Inline_Address'
     , 'CRM_Profile_Form_Edit'
     , 'CRM_Event_Form_Registration_Register'
@@ -151,32 +151,42 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
     // Assign the postcode lookup provider to form, so that we can call the related function in AJAX
     $settingsStr = \Civi::settings()->get('api_details');
     $settingsArray = unserialize($settingsStr);
-    $form->assign('civiPostCodeLookupProvider', $settingsArray['provider']);
+    $jsVars['lookupProvider'] = $settingsArray['provider'];
     $settingsArray['location_type_id'] = $settingsArray['location_type_id'] ?? [];
     $settingsArray['location_type_id']['Primary'] = 1;
     foreach ($settingsArray['location_type_id'] as $location => $_) {
       $addressSelectors[] = [
-        'id' => $location,
+        'suffix' => "-{$location}",
         'prefix' => '',
         'selector' => "#editrow-street_address-{$location}",
         'beforeSelector' => ".crm-profile #editrow-street_address-{$location}",
       ];
       // On behalf of address
       $addressSelectors[] = [
-        'id' => $location,
+        'suffix' => "-{$location}",
         'prefix' => 'onbehalf_',
         'selector' => "#onbehalf_street_address-{$location}",
         'beforeSelector' => "div#on-behalf-block fieldset div#editrow-street_address-{$location}",
       ];
+      // Backend addresses
+      $addressSelectors[] = [
+        'suffix' => '',
+        'prefix' => "address_{$location}_",
+        'selector' => "#address_{$location}_street_address",
+        'beforeSelector' => "tr#streetAddress_{$location}",
+      ];
     }
     // Billing address
     $addressSelectors[] = [
-      'id' => '5',
+      'suffix' => '-5',
       'prefix' => 'billing_',
       'selector' => '#billing_street_address-5',
       'beforeSelector' => '.billing_street_address-5-section',
     ];
 
+    $jsVars['addressSelectors'] = $addressSelectors;
+    \Civi::resources()->addVars('ukpostcodes', $jsVars);
+    \Civi::resources()->addScriptFile(E::LONG_NAME, 'js/ukpostcodelookup.js');
     $form->assign('ukpostcodesAddressSelectors', json_encode($addressSelectors));
   }
 }
