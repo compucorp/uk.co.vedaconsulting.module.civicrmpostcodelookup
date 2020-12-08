@@ -125,19 +125,20 @@ class CRM_Civicrmpostcodelookup_Page_PostcodeAnywhere extends CRM_Civicrmpostcod
     $addressLineArray[] = $addressItem['@attributes']['Line4'];
     $addressLineArray[] = $addressItem['@attributes']['Line5'];
     $addressLineArray = array_filter($addressLineArray);
-    $address["street_address"] = @implode(', ', $addressLineArray);
+    $address['street_address'] = @implode(', ', $addressLineArray);
 
-    $address["supplemental_address_1"] = $addressItem['@attributes']['SecondaryStreet'];
-    $address["supplemental_address_2"] = $addressItem['@attributes']['DependentLocality'];
+    $address['supplemental_address_1'] = $addressItem['@attributes']['SecondaryStreet'];
+    $address['supplemental_address_2'] = $addressItem['@attributes']['DependentLocality'];
 
-    $address["town"] = $addressItem['@attributes']['PostTown'];
+    $address['city'] = $addressItem['@attributes']['PostTown'];
 
-    $address["postcode"] = $addressItem['@attributes']['Postcode'];
+    $address['postcode'] = $addressItem['@attributes']['Postcode'];
 
-    $address["state_province_id"] = '';
+    $address['state_province_id'] = '';
     if ($stateId = array_search($addressItem['@attributes']['County'], $states)) {
-      $address["state_province_id"] = $stateId;
+      $address['state_province_id'] = $stateId;
     }
+    $address['country_id'] = 1226;
 
     return $address;
   }

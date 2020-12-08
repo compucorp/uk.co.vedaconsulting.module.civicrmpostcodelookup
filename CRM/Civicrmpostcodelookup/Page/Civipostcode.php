@@ -169,16 +169,17 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
     }
 
     if (!empty($addressLines[0])) {
-      $address["street_address"] = $addressLines[0];
+      $address['street_address'] = $addressLines[0];
     }
     if (!empty($addressLines[1])) {
-      $address["supplemental_address_1"] = $addressLines[1];
+      $address['supplemental_address_1'] = $addressLines[1];
     }
     if (!empty($addressLines[2])) {
-      $address["supplemental_address_2"] = $addressLines[2];
+      $address['supplemental_address_2'] = $addressLines[2];
     }
-    $address["town"] = (string) $addressObj->post_town;
-    $address["postcode"] = (string) $addressObj->postcode;
+    $address['city'] = (string) $addressObj->post_town;
+    $address['postcode'] = (string) $addressObj->postcode;
+    $address['country_id'] = 1226;
 
     return $address;
   }

@@ -114,16 +114,17 @@ class CRM_PostcodeLookup_Page_Ajax extends CRM_Civicrmpostcodelookup_Page_Postco
           $address["line{$lineCounter}"] = $line->Line;
           break;
         case 'Town':
-          $address["town"] = $line->Line;
+          $address['city'] = $line->Line;
           break;
         case 'County':
-          $address["county"] = $line->Line;
+          $address['county'] = $line->Line;
           break;
         case 'Postcode':
-          $address["postcode"] = $line->Line;
+          $address['postcode'] = $line->Line;
           break;
       }
     }
+    $address['country_id'] = 1226;
 
     return $address;
   }

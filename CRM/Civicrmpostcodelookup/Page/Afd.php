@@ -117,10 +117,11 @@ class CRM_Civicrmpostcodelookup_Page_Afd extends CRM_Civicrmpostcodelookup_Page_
     $address = ['id' => $moniker];
     $addressItem = (array) $simpleXMLData->Address;
 
-    $address["street"] = empty($addressItem['Street']) ? '':$addressItem['Street'];
-    $address["locality"] = empty($addressItem['Locality']) ? '':$addressItem['Locality'];
-    $address["town"] = empty($addressItem['Town']) ? '':$addressItem['Town'];
-    $address["postcode"] = empty($addressItem['Postcode']) ? '':$addressItem['Postcode'];
+    $address['street_address'] = empty($addressItem['Street']) ? '':$addressItem['Street'];
+    $address['locality'] = empty($addressItem['Locality']) ? '':$addressItem['Locality'];
+    $address['city'] = empty($addressItem['Town']) ? '':$addressItem['Town'];
+    $address['postcode'] = empty($addressItem['Postcode']) ? '':$addressItem['Postcode'];
+    $address['country_id'] = 1226;
 
     ##Close the XML source##
     fclose($filetoparse);
