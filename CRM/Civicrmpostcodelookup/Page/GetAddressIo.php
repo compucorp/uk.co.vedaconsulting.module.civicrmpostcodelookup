@@ -9,6 +9,7 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     }
     return parent::isValidPostcode($postcode);
   }
+
   /*
    * Function to get address list based on a Post code
    */
@@ -195,23 +196,29 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       $addressLineArray = self::formatAddressLines($addressId, $addressItem);
       $addressLineArray['postcode'] = $postcode;
 
-      $addressRow["id"] = $addressId;
-      $addressRow["value"] = $postcode;
-      $addressRow["label"] = @implode(', ', $addressLineArray);
+      $addressRow['id'] = $addressId;
+      $addressRow['value'] = $postcode;
+      $addressRow['label'] = @implode(', ', $addressLineArray);
       $addressRow['lineArray'] = $addressLineArray;
       array_push($addressList, $addressRow);
     }
 
     if (empty($addressList)) {
-      $addressRow["id"] = '';
-      $addressRow["value"] = '';
-      $addressRow["label"] = 'Postcode Not Found';
+      $addressRow['id'] = '';
+      $addressRow['value'] = '';
+      $addressRow['label'] = 'Postcode Not Found';
       array_push($addressList, $addressRow);
     }
 
     return $addressList;
   }
 
+  /**
+   * @param string $addressId
+   * @param array $addressItem
+   *
+   * @return array|void
+   */
   private static function formatAddressLines($addressId, $addressItem) {
     if (empty($addressItem)) {
       return;

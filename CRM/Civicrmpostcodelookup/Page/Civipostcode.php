@@ -46,12 +46,8 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
     $querystring = self::getCivipostcodeCredentials(1);
     $querystring = $querystring . "&postcode=" . urlencode($postcode) . "&property=" . $number;
 
-    ###############
-    #File Handling
-    ###############
-
-    ##Open the JSON Document##
-    $filetoparse = fopen("$querystring","r") or die("Error reading JSON data.");
+    // Open the JSON document
+    $filetoparse = fopen("$querystring", "r") or die("Error reading JSON data.");
     $data = stream_get_contents($filetoparse);
     $simpleJSONData = json_decode($data);
 
@@ -59,15 +55,12 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
       if ($simpleJSONData->is_error == 1) {
         $addresslist[0]['value'] = '';
         $addresslist[0]['label'] = $simpleJSONData->error;
-      } else {
+      }
+      else {
         $addresslist = self::getAddressList($simpleJSONData, $postcode);
       }
     }
-
-    // highlight search results
-    //$addresslist = CRM_Civicrmpostcodelookup_Utils::apply_highlight($addresslist, $postcode);
-
-    ##Close the JSON source##
+    // Close the JSON source
     fclose($filetoparse);
 
     echo json_encode($addresslist);
@@ -82,15 +75,16 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
       $addressLineArray = self::formatAddressLines($addressItem, TRUE);
       $addressLineArray = array_filter($addressLineArray);
 
-      $addressRow["id"] = (string) $addressItem->id;
-      $addressRow["value"] = $postcode;
-      $addressRow["label"] = @implode(', ', $addressLineArray);
+      $addressRow['id'] = (string) $addressItem->id;
+      $addressRow['value'] = $postcode;
+      $addressRow['label'] = @implode(', ', $addressLineArray);
+      $addressRow['lineArray'] = $addressLineArray;
       array_push($addressList, $addressRow);
     }
 
     if (empty($addressList)) {
-      $addressRow["id"] = '';
-      $addressRow["value"] = '';
+      $addressRow['id'] = '';
+      $addressRow['value'] = '';
       $addressRow["label"] = 'Postcode Not Found';
       array_push($addressList, $addressRow);
     }
@@ -102,12 +96,23 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
    * Function to get address details based on the Civipostcode address id
    */
   public static function getaddress() {
-    $moniker = CRM_Utils_Request::retrieve('id', 'String');
-    if (empty($moniker)) {
+    $selectedId = CRM_Utils_Request::retrieve('id', 'String');
+    if (empty($selectedId)) {
       exit;
     }
 
-    $address = self::getAddressByMoniker($moniker);
+    $querystring = self::getCivipostcodeCredentials(2);
+    $querystring = $querystring . "&id=" . urlencode($selectedId);
+
+    // Open the JSON Document
+    $filetoparse = fopen("$querystring","r") or die("Error reading JSON data.");
+    $data = stream_get_contents($filetoparse);
+    $simpleJSONData = json_decode($data);
+    $addressObj = $simpleJSONData->results[0];
+    $address = self::formatAddressLines($addressObj);
+    // Close the JSON source
+    fclose($filetoparse);
+
     $response = [
       'address' => $address
     ];
@@ -116,28 +121,12 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
     exit;
   }
 
-  private static function getAddressByMoniker($moniker) {
-    $querystring = self::getCivipostcodeCredentials(2);
-    $querystring = $querystring . "&id=" . urlencode($moniker);
-
-    ###############
-    #File Handling
-    ###############
-
-    ##Open the JSON Document##
-    $filetoparse = fopen("$querystring","r") or die("Error reading JSON data.");
-    $data = stream_get_contents($filetoparse);
-    $simpleJSONData = json_decode($data);
-    $addressObj = $simpleJSONData->results[0];
-
-    $address = self::formatAddressLines($addressObj);
-
-    ##Close the JSON source##
-    fclose($filetoparse);
-
-    return $address;
-  }
-
+  /**
+   * @param Object $addressObj
+   * @param bool $forList
+   *
+   * @return array|void
+   */
   private static function formatAddressLines($addressObj, $forList = FALSE) {
     if (empty($addressObj)) {
       return;
