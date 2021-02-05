@@ -74,6 +74,8 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
     foreach ($AddressListItem as $key => $addressItem) {
       $addressLineArray = self::formatAddressLines($addressItem, TRUE);
       $addressLineArray = array_filter($addressLineArray);
+      // Don't display country_id in address list
+      unset($addressLineArray['country_id']);
 
       $addressRow['id'] = (string) $addressItem->id;
       $addressRow['value'] = $postcode;

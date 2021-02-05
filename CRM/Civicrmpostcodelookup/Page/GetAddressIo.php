@@ -194,6 +194,8 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       $addressId = $postcode . '_' . $key;
 
       $addressLineArray = self::formatAddressLines($addressId, $addressItem);
+      // Don't display country_id in address list
+      unset($addressLineArray['country_id']);
       $addressLineArray['postcode'] = $postcode;
 
       $addressRow['id'] = $addressId;
