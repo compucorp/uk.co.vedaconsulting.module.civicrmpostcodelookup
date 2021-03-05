@@ -19,7 +19,7 @@
               '</div>' +
               '<div class="edit-value content">' +
               '<div class="crm-postcodelookup-textbox-wrapper">' +
-              '<input placeholder="Start typing a postcode" name="' + postcodeElement + '" id="' + postcodeElement + '" class="crm-postcodelookup ui-autocomplete-input" style="width: 25em;">' +
+              '<input placeholder="Start typing a postcode" name="' + postcodeElement + '" id="' + postcodeElement + '" class="crm-postcodelookup ui-autocomplete-input">' +
               '</div>' +
               '</div>' +
               '<div class="clear" />' +
