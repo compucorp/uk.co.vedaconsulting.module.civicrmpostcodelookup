@@ -49,21 +49,23 @@ class CRM_Civicrmpostcodelookup_Page_Civipostcode extends CRM_Civicrmpostcodeloo
     // Open the JSON document
     $filetoparse = fopen("$querystring", "r") or die("Error reading JSON data.");
     $data = stream_get_contents($filetoparse);
-    $simpleJSONData = json_decode($data);
-
-    if (!empty($simpleJSONData)) {
-      if ($simpleJSONData->is_error == 1) {
-        $addresslist[0]['value'] = '';
-        $addresslist[0]['label'] = $simpleJSONData->error;
-      }
-      else {
-        $addresslist = self::getAddressList($simpleJSONData, $postcode);
-      }
-    }
     // Close the JSON source
     fclose($filetoparse);
+    $simpleJSONData = json_decode($data);
 
-    echo json_encode($addresslist);
+    $addressList = NULL;
+    if (!empty($simpleJSONData)) {
+      if ($simpleJSONData->is_error == 1) {
+        $addressList[0]['value'] = '';
+        $addressList[0]['label'] = $simpleJSONData->error;
+      }
+      else {
+        $addressList = self::getAddressList($simpleJSONData, $postcode);
+      }
+    }
+
+    echo json_encode($addressList);
+
     exit;
   }
 
