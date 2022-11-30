@@ -20,11 +20,23 @@
   <script>
     CRM.$(function($) {
       $('#server').parent().append('<br />Without trailing slash. Example: http://pce.afd.co.uk , http://civipostcode.com');
+      $('#CIVICRM_QFID_1_import_method').parent().append('<br /> <br /> Please provide PAF file in CSV format received from the Royal Mail');
       hideAllFields();
       showFields();
       $('#provider').change(function() {
         hideAllFields();
         showFields();
+      });
+      $('input[name="import_method"]').click(function() {
+        importMethodToggle();
+      });
+
+      $('#paf_file').change(function() {
+        var maxUploadFileSize = {/literal} {$maxFileSize} {literal}
+        if (this.files[0].size > maxUploadFileSize){
+          CRM.alert("This file exceeds the maximum upload size limit for this server", "Maximum Upload Size Limit", 'error');
+          this.value = "";
+        }
       });
 
       function hideAllFields() {
@@ -33,6 +45,9 @@
         $('#serial_number').parent().parent().hide();
         $('#username').parent().parent().hide();
         $('#password').parent().parent().hide();
+        $('#CIVICRM_QFID_1_import_method').parent().parent().hide();
+        $('#paf_file_url').parent().parent().hide();
+        $('#paf_file').parent().parent().hide();
       }
 
       function showFields() {
@@ -63,6 +78,26 @@
           $('#server').parent().parent().show();
           $('#api_key').parent().parent().show();
           $('#server').val('https://api.getAddress.io');
+        }
+        else if (providerVal === 'serverupload') {
+          $('#CIVICRM_QFID_1_import_method').parent().parent().show();
+          var pafFileName = {/literal}"{$pafFileName}"{literal};
+          if (pafFileName) {
+            $('#paf_file').after('<div>' + pafFileName + ' was the last processed uploaded file! </div>');
+          }
+          importMethodToggle();
+        }
+      }
+
+      function importMethodToggle() {
+        var importMethod = $('input[name="import_method"]:checked').val();
+        if (importMethod === '1') {
+          $('#paf_file').parent().parent().show();
+          $('#paf_file_url').parent().parent().hide();
+        }
+        else if(importMethod === '2') {
+          $('#paf_file_url').parent().parent().show();
+          $('#paf_file').parent().parent().hide()
         }
       }
     });

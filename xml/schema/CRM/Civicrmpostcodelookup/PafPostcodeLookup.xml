@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Civicrmpostcodelookup</base>
+  <class>PafPostcodeLookup</class>
+  <name>paf_post_code_lookup</name>
+  <comment>Store the Postcode Address File data</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique PafPostcodeLookup ID</comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>post_code</name>
+    <title>Post Code</title>
+    <type>varchar</type>
+    <length>12</length>
+  </field>
+  <field>
+    <name>post_town</name>
+    <title>Post Town</title>
+    <type>varchar</type>
+    <length>30</length>
+  </field>
+  <field>
+    <name>dependent_locality</name>
+    <title>Dependent Locality</title>
+    <type>varchar</type>
+    <length>35</length>
+  </field>
+  <field>
+    <name>double_dependent_locality</name>
+    <title>Double Dependent Locality</title>
+    <type>varchar</type>
+    <length>35</length>
+  </field>
+  <field>
+    <name>thoroughfare_descriptor</name>
+    <title>Thoroughfare Descriptor</title>
+    <type>varchar</type>
+    <length>80</length>
+  </field>
+  <field>
+    <name>dependent_thoroughfare_descriptor</name>
+    <title>Dependent Thoroughfare Descriptor</title>
+    <type>varchar</type>
+    <length>80</length>
+  </field>
+  <field>
+    <name>building_number</name>
+    <title>Building Number</title>
+    <type>varchar</type>
+    <length>4</length>
+  </field>
+  <field>
+    <name>building_name</name>
+    <title>Building Name</title>
+    <type>varchar</type>
+    <length>50</length>
+  </field>
+  <field>
+    <name>sub_building_name</name>
+    <title>Sub Building Name</title>
+    <type>varchar</type>
+    <length>30</length>
+  </field>
+  <field>
+    <name>po_box</name>
+    <title>PO Box</title>
+    <type>varchar</type>
+    <length>6</length>
+  </field>
+  <field>
+    <name>department_name</name>
+    <title>Department Name</title>
+    <type>varchar</type>
+    <length>60</length>
+  </field>
+  <field>
+    <name>organisation_name</name>
+    <title>Organisation Name</title>
+    <type>varchar</type>
+    <length>60</length>
+  </field>
+  <field>
+    <name>udprn</name>
+    <title>UDPRN</title>
+    <type>varchar</type>
+    <length>8</length>
+  </field>
+  <field>
+    <name>postcode_type</name>
+    <title>Postcode Type</title>
+    <type>varchar</type>
+    <length>3</length>
+  </field>
+  <field>
+    <name>su_organisation_indicator</name>
+    <title>Organisation Indicator</title>
+    <type>varchar</type>
+    <length>3</length>
+  </field>
+  <field>
+    <name>delivery_point_suffix</name>
+    <title>Delivery Point Suffix</title>
+    <type>varchar</type>
+    <length>3</length>
+  </field>
+
+  <!--Indexes-->
+  <index>
+    <name>index_post_code</name>
+    <fieldName>post_code</fieldName>
+  </index>
+</table>

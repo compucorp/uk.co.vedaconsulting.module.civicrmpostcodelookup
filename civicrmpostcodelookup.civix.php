@@ -457,5 +457,10 @@ function _civicrmpostcodelookup_civix_civicrm_alterSettingsFolders(&$metaDataFol
 
 function _civicrmpostcodelookup_civix_civicrm_entityTypes(&$entityTypes) {
   $entityTypes = array_merge($entityTypes, [
+    'CRM_Civicrmpostcodelookup_DAO_PafPostcodeLookup' => [
+      'name' => 'PafPostcodeLookup',
+      'class' => 'CRM_Civicrmpostcodelookup_DAO_PafPostcodeLookup',
+      'table' => 'civicrm_paf_postcode_lookup',
+    ],
   ]);
 }
