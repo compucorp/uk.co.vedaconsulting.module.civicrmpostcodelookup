@@ -30,7 +30,6 @@ function civicrmpostcodelookup_civicrm_config(&$config) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
 function civicrmpostcodelookup_civicrm_xmlMenu(&$files) {
-  _civicrmpostcodelookup_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -94,7 +93,6 @@ function civicrmpostcodelookup_civicrm_upgrade($op, CRM_Queue_Queue $queue = NUL
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
 function civicrmpostcodelookup_civicrm_managed(&$entities) {
-  _civicrmpostcodelookup_civix_civicrm_managed($entities);
 }
 
 /**
@@ -107,7 +105,6 @@ function civicrmpostcodelookup_civicrm_managed(&$entities) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
  */
 function civicrmpostcodelookup_civicrm_caseTypes(&$caseTypes) {
-  _civicrmpostcodelookup_civix_civicrm_caseTypes($caseTypes);
 }
 
 /**
@@ -116,7 +113,6 @@ function civicrmpostcodelookup_civicrm_caseTypes(&$caseTypes) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
 function civicrmpostcodelookup_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _civicrmpostcodelookup_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 /**
