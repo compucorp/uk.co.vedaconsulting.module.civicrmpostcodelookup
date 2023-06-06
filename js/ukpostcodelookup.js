@@ -114,7 +114,9 @@
             $(AddstreetAddressElement1).val('');
             $(cityElement).val('');
             $(postcodeElement).val('');
-            $(countryElement).val(address.country_id).trigger('change');
+            if (address.country_id) {
+              $(countryElement).val(address.country_id).trigger('change');
+            }
 
             if (($(AddstreetAddressElement1).length === 0) && (typeof address.supplemental_address_2 !== 'undefined')) {
               if (typeof address.supplemental_address_1 !== 'undefined') {
