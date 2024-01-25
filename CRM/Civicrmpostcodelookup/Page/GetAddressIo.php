@@ -21,7 +21,6 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     }
 
     $addressList = \Civi::cache('long')->get("ukpostcodes_{$postcode}") ?? NULL;
-    $addressList= NULL;
     if (!isset($addressList)) {
       // get address result from getAddress.io
       $apiUrl = self::getAddressIoApiUrl($postcode);
