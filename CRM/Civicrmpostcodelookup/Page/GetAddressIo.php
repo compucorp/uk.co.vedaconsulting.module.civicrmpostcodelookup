@@ -21,6 +21,7 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     }
 
     $addressList = \Civi::cache('long')->get("ukpostcodes_{$postcode}") ?? NULL;
+    $addressList= NULL;
     if (!isset($addressList)) {
       // get address result from getAddress.io
       $apiUrl = self::getAddressIoApiUrl($postcode);
@@ -82,7 +83,7 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     $servertarget = $settingsArray['server'];
 
     // https://api.getAddress.io/find/{postcode}/{house}
-    $servertarget = $servertarget . "/find";
+    $servertarget = $servertarget . "/autocomplete";
 
     // search by postcode
     if ($postcode && !empty($postcode)) {
@@ -96,7 +97,9 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
 
     $apiKey = $settingsArray['api_key'];
 
-    $querystring = "api-key=$apiKey&expand=true";
+    $querystring = "api-key=$apiKey&all=true&template={line_1},{line_2},{line_3},{line_4},{town_or_city},{locality},{county}";
+    
+    \Civi::log('civicrmpostcodelookup')->info("calling url: ".$servertarget ."?" . $querystring);
     return $servertarget ."?" . $querystring;
   }
 
@@ -159,10 +162,13 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       $addressData['Message'] = 'Unknown Error';
     }
     else {
-      $resultObject = json_decode($result);
-      $addressData = (array)$resultObject;
+      #\Civi::log('civicrmpostcodelookup')->info("api returned raw: ". $result);
+      $resultObject = json_decode($result,TRUE);
+      $addressData = $resultObject;
       $addressData['is_error'] = 0;
     }
+    
+    #\Civi::log('civicrmpostcodelookup')->info("api returned: ". print_r($addressData,TRUE));
     return $addressData;
   }
 
@@ -187,20 +193,31 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       return $addressList;
     }
     $postcode = self::format($postcode, TRUE);
-    $AddressListItem = $addressData['addresses'];
+    $AddressListItem = $addressData['suggestions'];
     foreach ($AddressListItem as $key => $addressItem) {
+
+      \Civi::log('civicrmpostcodelookup')->info("processing api line: ".$key." - ". print_r($addressItem,TRUE));
 
       // FIX me : There is no address id found in th API, hence assigning combination of postcode & arrayresultID as rowId inorder to get the selected address later
       $addressId = $postcode . '_' . $key;
 
       $addressLineArray = self::formatAddressLines($addressId, $addressItem);
+      
+      $addressLineLabelArray = $addressLineArray;
+      unset($addressLineLabelArray['country_id']);
+      unset($addressLineLabelArray['state_province_id']);
+      unset($addressLineLabelArray['country']);
+
       // Don't display country_id in address list
-      unset($addressLineArray['country_id']);
+      
       $addressLineArray['postcode'] = $postcode;
 
       $addressRow['id'] = $addressId;
       $addressRow['value'] = $postcode;
-      $addressRow['label'] = @implode(', ', $addressLineArray);
+      
+      
+      $addressRow['label'] = @implode(', ', $addressLineLabelArray);
+      
       $addressRow['lineArray'] = $addressLineArray;
       array_push($addressList, $addressRow);
     }
@@ -212,6 +229,7 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       array_push($addressList, $addressRow);
     }
 
+
     return $addressList;
   }
 
@@ -222,39 +240,59 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
    * @return array|void
    */
   private static function formatAddressLines($addressId, $addressItem) {
+    
     if (empty($addressItem)) {
       return;
     }
+    
+    $address=array();
+    
+    $address_str=$addressItem["address"];
+    $address_bits=explode(",",$address_str);
 
-    if (!empty($addressItem->line_1)) {
-      $address['street_address'] = $addressItem->line_1;
-    }
-    if (!empty($addressItem->line_2)) {
-      $address['supplemental_address_1'] = $addressItem->line_2;
-    };
-    if (!empty($addressItem->line_3)) {
-      $address['supplemental_address_2'] = $addressItem->line_2;
-    }
-    if (!empty($addressItem->town_or_city)) {
-      $address['city'] = $addressItem->town_or_city;
+    #\Civi::log('civicrmpostcodelookup')->info("address bits: ". print_r($address_bits,TRUE));
+
+    if (!empty($address_bits[0])) {
+      $address['street_address'] = $address_bits[0];
     }
 
+    if (!empty($address_bits[1])) {
+      $address['supplemental_address_1'] = $address_bits[1];
+    }
+      
+    if (!empty($address_bits[2])) {
+      $address['supplemental_address_2']=$address_bits[2];
+    }
+
+    if (!empty($address_bits[3])) {
+      $address['supplemental_address_3']=$address_bits[3];
+    }
+
+
+    
+    if (!empty($address_bits[4])) {
+      $address['city'] = $address_bits[4];
+    }
+ 
     // Get state/county
     if (!isset(\Civi::$statics[__FUNCTION__]['stateprovince'])) {
       \Civi::$statics[__FUNCTION__]['stateprovince'] = CRM_Core_PseudoConstant::stateProvince();
     }
 
     $address['state_province_id'] = '';
-    if (!empty($addressItem->county)) {
-      $stateProvinceID = array_search($addressItem->county, \Civi::$statics[__FUNCTION__]['stateprovince']);
-
+    if (!empty($address_bits[6])) {
+    
+      #\Civi::log('civicrmpostcodelookup')->info("county= ". $address_bits[6]);
+      $stateProvinceID = array_search($address_bits[6], \Civi::$statics[__FUNCTION__]['stateprovince']);
+      #\Civi::log('civicrmpostcodelookup')->info("countycode = ". $stateProvinceID);
       if ($stateProvinceID) {
         // Display actual state name in selection list
         $address['state_province_id'] = $stateProvinceID;
       }
-      $address['state_province'] = $addressItem->county;
+      $address['state_province'] = $address_bits[6];
     }
     $address['country_id'] = 1226;
+    $address['country'] = "United Kingdom";
 
     return $address;
   }
