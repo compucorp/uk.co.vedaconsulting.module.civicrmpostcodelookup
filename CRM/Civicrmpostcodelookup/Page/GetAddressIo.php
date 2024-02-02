@@ -97,8 +97,6 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     $apiKey = $settingsArray['api_key'];
 
     $querystring = "api-key=$apiKey&all=true&template={line_1},{line_2},{line_3},{line_4},{town_or_city},{locality},{county}";
-    
-    \Civi::log('civicrmpostcodelookup')->info("calling url: ".$servertarget ."?" . $querystring);
     return $servertarget ."?" . $querystring;
   }
 
@@ -161,13 +159,10 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       $addressData['Message'] = 'Unknown Error';
     }
     else {
-      #\Civi::log('civicrmpostcodelookup')->info("api returned raw: ". $result);
       $resultObject = json_decode($result,TRUE);
       $addressData = $resultObject;
       $addressData['is_error'] = 0;
     }
-    
-    #\Civi::log('civicrmpostcodelookup')->info("api returned: ". print_r($addressData,TRUE));
     return $addressData;
   }
 
@@ -194,8 +189,6 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     $postcode = self::format($postcode, TRUE);
     $AddressListItem = $addressData['suggestions'];
     foreach ($AddressListItem as $key => $addressItem) {
-
-      \Civi::log('civicrmpostcodelookup')->info("processing api line: ".$key." - ". print_r($addressItem,TRUE));
 
       // FIX me : There is no address id found in th API, hence assigning combination of postcode & arrayresultID as rowId inorder to get the selected address later
       $addressId = $postcode . '_' . $key;
@@ -228,7 +221,6 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
       array_push($addressList, $addressRow);
     }
 
-
     return $addressList;
   }
 
@@ -239,7 +231,6 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
    * @return array|void
    */
   private static function formatAddressLines($addressId, $addressItem) {
-    
     if (empty($addressItem)) {
       return;
     }
@@ -248,8 +239,6 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
     
     $address_str=$addressItem["address"];
     $address_bits=explode(",",$address_str);
-
-    #\Civi::log('civicrmpostcodelookup')->info("address bits: ". print_r($address_bits,TRUE));
 
     if (!empty($address_bits[0])) {
       $address['street_address'] = $address_bits[0];
@@ -280,10 +269,8 @@ class CRM_Civicrmpostcodelookup_Page_GetAddressIo extends CRM_Civicrmpostcodeloo
 
     $address['state_province_id'] = '';
     if (!empty($address_bits[6])) {
-    
-      #\Civi::log('civicrmpostcodelookup')->info("county= ". $address_bits[6]);
       $stateProvinceID = array_search($address_bits[6], \Civi::$statics[__FUNCTION__]['stateprovince']);
-      #\Civi::log('civicrmpostcodelookup')->info("countycode = ". $stateProvinceID);
+
       if ($stateProvinceID) {
         // Display actual state name in selection list
         $address['state_province_id'] = $stateProvinceID;
