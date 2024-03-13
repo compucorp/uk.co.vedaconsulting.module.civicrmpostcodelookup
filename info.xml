@@ -13,13 +13,22 @@
     <url desc="Support">https://lab.civicrm.org/extensions/ukpostcodes/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2021-11-23</releaseDate>
-  <version>1.12</version>
+  <releaseDate>2024-03-13</releaseDate>
+  <version>1.2</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.35</ver>
+    <ver>5.68</ver>
   </compatibility>
   <civix>
     <namespace>CRM/Civicrmpostcodelookup</namespace>
+    <format>23.02.1</format>
   </civix>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.1</mixin>
+  </mixins>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
 </extension>

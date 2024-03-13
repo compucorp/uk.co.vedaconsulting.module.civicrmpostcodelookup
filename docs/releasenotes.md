@@ -9,6 +9,9 @@ Releases use the following numbering system:
 
 * **[BC]**: Items marked with [BC] indicate a breaking change that will require updates to your code if you are using that code in your extension.
 
+## Release 1.2
+
+
 ## Release 1.12
 
 * PHP7.4 compatibility.
