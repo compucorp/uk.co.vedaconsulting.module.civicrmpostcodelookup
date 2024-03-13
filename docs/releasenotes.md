@@ -9,8 +9,12 @@ Releases use the following numbering system:
 
 * **[BC]**: Items marked with [BC] indicate a breaking change that will require updates to your code if you are using that code in your extension.
 
-## Release 1.2
+## Release 1.13 (2024-03-13)
 
+* PHP8.2, Smarty3 compatibility.
+* [!8](https://lab.civicrm.org/extensions/ukpostcodes/-/merge_requests/8) Update getaddress.io to work with latest API.
+* [!7](https://lab.civicrm.org/extensions/ukpostcodes/-/merge_requests/7) Enable postcode lookup on civicrm profiles and drupal user registration screen.
+* [!5](https://lab.civicrm.org/extensions/ukpostcodes/-/merge_requests/5) Fixes reset of country field.
 
 ## Release 1.12
 
