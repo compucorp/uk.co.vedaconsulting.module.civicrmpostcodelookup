@@ -146,6 +146,7 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
     , 'CRM_Event_Form_ManageEvent_Location'
     , 'CRM_Financial_Form_Payment'
     , 'CRM_Contact_Form_Domain'
+    , 'CRM_Profile_Form_Dynamic'
   ];
   if (in_array($formName, $postCodeLookupPages)) {
     // Assign the postcode lookup provider to form, so that we can call the related function in AJAX
@@ -159,7 +160,7 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
         'suffix' => "-{$location}",
         'prefix' => '',
         'selector' => "#editrow-street_address-{$location}",
-        'beforeSelector' => ".crm-profile #editrow-street_address-{$location}",
+        'beforeSelector' => "#editrow-street_address-{$location}",
       ];
       // On behalf of address
       $addressSelectors[] = [
@@ -187,6 +188,16 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
     $jsVars['addressSelectors'] = $addressSelectors;
     \Civi::resources()->addVars('ukpostcodes', $jsVars);
     \Civi::resources()->addScriptFile(E::LONG_NAME, 'js/ukpostcodelookup.js');
+
+    // This block would be optimally placed in a distinct Drupal module. However, considering the minimal amount of
+    // code needed to properly inject the JavaScript, creating a separate module may introduce unnecessary complexity
+    // and effort that doesn't justify the means.
+    if (strpos(CRM_Core_Config::singleton()->userFramework, 'Drupal') === 0) {
+      // For profiles embedded in user/register screen
+      if (\Drupal::service('path.current')->getPath() == '/user/register') {
+        \Civi::resources()->addScriptUrl(\Civi::resources()->getUrl(E::LONG_NAME) . 'js/ukpostcodelookup.js', 1000, 'html-header');
+      }
+    }
     $form->assign('ukpostcodesAddressSelectors', json_encode($addressSelectors));
   }
 }
