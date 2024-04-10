@@ -114,7 +114,7 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
     // This block would be optimally placed in a distinct Drupal module. However, considering the minimal amount of
     // code needed to properly inject the JavaScript, creating a separate module may introduce unnecessary complexity
     // and effort that doesn't justify the means.
-    if (strpos(CRM_Core_Config::singleton()->userFramework, 'Drupal') === 0) {
+    if (strpos(CRM_Core_Config::singleton()->userFramework, 'Drupal8') === 0) {
       // For profiles embedded in user/register screen
       if (\Drupal::service('path.current')->getPath() == '/user/register') {
         \Civi::resources()->addScriptUrl(\Civi::resources()->getUrl(E::LONG_NAME) . 'js/ukpostcodelookup.js', 1000, 'html-header');
