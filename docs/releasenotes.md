@@ -9,6 +9,10 @@ Releases use the following numbering system:
 
 * **[BC]**: Items marked with [BC] indicate a breaking change that will require updates to your code if you are using that code in your extension.
 
+## Release 1.14 (2024-05-30)
+
+* Fix undefined class "Drupal" on Drupal 7.
+
 ## Release 1.13 (2024-03-13)
 
 * PHP8.2, Smarty3 compatibility.
