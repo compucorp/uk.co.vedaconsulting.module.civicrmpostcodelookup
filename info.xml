@@ -17,15 +17,20 @@
   <version>1.9</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.19</ver>
+    <ver>5.27</ver>
   </compatibility>
   <comments>PATCH 2</comments>
   <comments>Developed by Veda NFP Consulting LTD.</comments>
   <civix>
     <namespace>CRM/Civicrmpostcodelookup</namespace>
-    <format>22.05.2</format>
+    <format>23.02.1</format>
   </civix>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.1</mixin>
   </mixins>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
 </extension>
