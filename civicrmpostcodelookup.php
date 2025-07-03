@@ -87,7 +87,8 @@ function civicrmpostcodelookup_civicrm_buildForm($formName, &$form) {
  * @return void
  */
 function civicrmpostcodelookup_civicrm_permission(&$permissions) {
-  $permissions += [
-    'access postcode lookup' => E::ts('CiviCRM: Access CiviCRM Postcode lookups'),
+  $permissions['access postcode lookup'] = [
+    'label' => E::ts('CiviCRM: Access CiviCRM Postcode lookups'),
+    'description' => E::ts('Allows the user to lookup postcodes.')
   ];
 }
