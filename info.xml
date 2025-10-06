@@ -19,6 +19,7 @@
   <compatibility>
     <ver>5.68</ver>
   </compatibility>
+  <comments>PATCH 1</comments>
   <civix>
     <namespace>CRM/Civicrmpostcodelookup</namespace>
     <format>23.02.1</format>
