@@ -79,6 +79,7 @@
         var streetAddressElement = '#' + blockPrefix + 'street_address' + blockSuffix;
         var AddstreetAddressElement = '#' + blockPrefix + 'supplemental_address_1' + blockSuffix;
         var AddstreetAddressElement1 = '#' + blockPrefix + 'supplemental_address_2' + blockSuffix;
+        var AddstreetAddressElement2 = '#' + blockPrefix + 'supplemental_address_3' + blockSuffix;
         var cityElement = '#' + blockPrefix + 'city' + blockSuffix;
         var countyElement = '#' + blockPrefix + 'state_province_id' + blockSuffix;
         if ($(countyElement).length === 0) {
@@ -94,6 +95,7 @@
           line1: streetAddressElement,
           line2: AddstreetAddressElement,
           line3: AddstreetAddressElement1,
+          line4: AddstreetAddressElement2,
           city: cityElement
         };
 
@@ -112,12 +114,22 @@
             $(streetAddressElement).val('');
             $(AddstreetAddressElement).val('');
             $(AddstreetAddressElement1).val('');
+            $(AddstreetAddressElement2).val('');
             $(cityElement).val('');
             $(postcodeElement).val('');
             if (address.country_id) {
               $(countryElement).val(address.country_id).trigger('change');
             }
 
+            if (($(AddstreetAddressElement2).length === 0) && (typeof address.supplemental_address_3 !== 'undefined')) {
+              if (typeof address.supplemental_address_1 !== 'undefined') {
+                address.supplemental_address_1 = address.supplemental_address_1 + ', ';
+              }
+              if (typeof address.supplemental_address_2 !== 'undefined') {
+                address.supplemental_address_2 = address.supplemental_address_2 + ', ';
+              }
+              address.supplemental_address_2 = address.supplemental_address_1 + address.supplemental_address_2 + address.supplemental_address_3;
+            }
             if (($(AddstreetAddressElement1).length === 0) && (typeof address.supplemental_address_2 !== 'undefined')) {
               if (typeof address.supplemental_address_1 !== 'undefined') {
                 address.supplemental_address_1 = address.supplemental_address_1 + ', ';
@@ -131,6 +143,7 @@
             $(streetAddressElement).val(address.street_address);
             $(AddstreetAddressElement).val(address.supplemental_address_1);
             $(AddstreetAddressElement1).val(address.supplemental_address_2);
+            $(AddstreetAddressElement2).val(address.supplemental_address_3);
             $(cityElement).val(address.city);
             $(postcodeElement).val(address.postcode);
 
@@ -143,6 +156,7 @@
             $(streetAddressElement).trigger('change');
             $(AddstreetAddressElement).trigger('change');
             $(AddstreetAddressElement1).trigger('change');
+            $(AddstreetAddressElement2).trigger('change');
             $(cityElement).trigger('change');
             $(postcodeElement).trigger('change');
             $(countyElement).trigger('change');
