@@ -121,23 +121,36 @@
               $(countryElement).val(address.country_id).trigger('change');
             }
 
-            if (($(AddstreetAddressElement2).length === 0) && (typeof address.supplemental_address_3 !== 'undefined')) {
-              if (typeof address.supplemental_address_1 !== 'undefined') {
-                address.supplemental_address_1 = address.supplemental_address_1 + ', ';
+            // Helper to join address line parts, skipping any that are undefined/null/empty.
+            // Avoids stray ", " separators and prevents in-place mutation of source values.
+            var joinAddressParts = function () {
+              var parts = [];
+              for (var i = 0; i < arguments.length; i++) {
+                var v = arguments[i];
+                if (typeof v !== 'undefined' && v !== null && v !== '') {
+                  parts.push(v);
+                }
               }
-              if (typeof address.supplemental_address_2 !== 'undefined') {
-                address.supplemental_address_2 = address.supplemental_address_2 + ', ';
-              }
-              address.supplemental_address_2 = address.supplemental_address_1 + address.supplemental_address_2 + address.supplemental_address_3;
+              return parts.join(', ');
+            };
+
+            // If the Address Line 4 (supplemental_address_3) field is not on the form,
+            // fold its value up into supplemental_address_2.
+            if (($(AddstreetAddressElement2).length === 0) && (typeof address.supplemental_address_3 !== 'undefined') && address.supplemental_address_3 !== '') {
+              address.supplemental_address_2 = joinAddressParts(address.supplemental_address_2, address.supplemental_address_3);
+              address.supplemental_address_3 = '';
             }
-            if (($(AddstreetAddressElement1).length === 0) && (typeof address.supplemental_address_2 !== 'undefined')) {
-              if (typeof address.supplemental_address_1 !== 'undefined') {
-                address.supplemental_address_1 = address.supplemental_address_1 + ', ';
-              }
-              address.supplemental_address_1 = address.supplemental_address_1 + address.supplemental_address_2;
+            // If the Address Line 3 (supplemental_address_2) field is not on the form,
+            // fold its value up into supplemental_address_1.
+            if (($(AddstreetAddressElement1).length === 0) && (typeof address.supplemental_address_2 !== 'undefined') && address.supplemental_address_2 !== '') {
+              address.supplemental_address_1 = joinAddressParts(address.supplemental_address_1, address.supplemental_address_2);
+              address.supplemental_address_2 = '';
             }
-            if (($(AddstreetAddressElement).length === 0) && (typeof address.supplemental_address_1 !== 'undefined')) {
-              address.street_address = address.street_address + ', ' + address.supplemental_address_1;
+            // If the Address Line 2 (supplemental_address_1) field is not on the form,
+            // fold its value up into street_address.
+            if (($(AddstreetAddressElement).length === 0) && (typeof address.supplemental_address_1 !== 'undefined') && address.supplemental_address_1 !== '') {
+              address.street_address = joinAddressParts(address.street_address, address.supplemental_address_1);
+              address.supplemental_address_1 = '';
             }
 
             $(streetAddressElement).val(address.street_address);
